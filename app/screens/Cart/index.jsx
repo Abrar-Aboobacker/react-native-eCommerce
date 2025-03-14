@@ -1,83 +1,57 @@
 import React, { useContext } from "react";
-import {
-  View,
-  Text,
-  Button,
-  FlatList,
-  StyleSheet,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, FlatList, StyleSheet, Image } from "react-native";
 import CartContext from "../../context/Cartcontext";
+import CartCard from "./components";
+import { image } from "../../../assets";
 
 const Cart = () => {
-  const { cart, setCart } = useContext(CartContext);
+  const { cart } = useContext(CartContext);
 
-  const removeFromCart = (index) => {
-    const updatedCart = cart.filter((_, i) => i !== index);
-    setCart(updatedCart);
-  };
-
-  const totalPrice = cart.reduce((total, item) => total + item.price, 0);
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.header}>Shopping Cart</Text>
-
       {cart.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Your cart is empty</Text>
+        <View style={styles.productContainer}>
+          <Image source={image.NoOrder} style={styles.noProducts} />
+          <Text style={styles.emptyText}>Cart is Empty</Text>
         </View>
       ) : (
         <FlatList
           data={cart}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => (
-            <View style={styles.cartItem}>
-              <Text style={styles.text}>{item.name}</Text>
-              <Text style={styles.text}>${item.price}</Text>
-              <Button
-                title="Remove"
-                color="red"
-                onPress={() => removeFromCart(index)}
-              />
-            </View>
-          )}
-          contentContainerStyle={styles.listContent}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <CartCard item={item} />}
         />
       )}
-
       <View style={styles.totalContainer}>
         <Text style={styles.total}>Total: ${totalPrice.toFixed(2)}</Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
     padding: 20,
+    backgroundColor: "white",
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
   },
-  emptyContainer: {
-    flex: 1,
-  },
   emptyText: {
     fontSize: 18,
     textAlign: "center",
     marginTop: 20,
   },
-  listContent: {
-    paddingBottom: 10,
-  },
   cartItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
     marginVertical: 5,
@@ -88,10 +62,31 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
+    flex: 1,
+    marginLeft: 10,
+  },
+  image: {
+    width: 50,
+    height: 50,
+    borderRadius: 5,
+  },
+  quantityContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  button: {
+    fontSize: 20,
+    fontWeight: "bold",
+    paddingHorizontal: 10,
+    color: "blue",
+  },
+  quantity: {
+    fontSize: 18,
+    marginHorizontal: 10,
   },
   totalContainer: {
     position: "absolute",
-    bottom: 130,
+    bottom: 90,
     left: 20,
     right: 20,
     backgroundColor: "white",
@@ -105,6 +100,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
+  },
+  productContainer: {
+    flex: 0.8,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noProducts: {
+    height: 130,
+    width: 200,
+    objectFit: "contain",
+  },
+  emptyText: {
+    fontWeight: "400",
+    color: "#70727D",
+    marginTop: 10,
   },
 });
 

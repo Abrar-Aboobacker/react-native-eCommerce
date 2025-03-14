@@ -1,95 +1,119 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, Button, FlatList, StyleSheet } from "react-native";
-import CartContext from "../../context/Cartcontext";
+import React, { useEffect, useState } from "react";
+import { View, Text, Button, FlatList, StyleSheet, Image } from "react-native";
+import ProductCard from "./components/ProductCard";
+import { image, product } from "../../../assets";
+import SkeletonLoader from "../../core/Components/SkeltonLoader";
 
-
-const Products = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(true);
+const Product = () => {
   const [products, setProducts] = useState([]);
-  const { cart, setCart } = useContext(CartContext);
+  const [loading, setLoading] = useState(true);
 
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
   useEffect(() => {
     setTimeout(() => {
       setProducts([
-        { name: "Product 1", price: 100 },
-        { name: "Product 2", price: 200 },
-        { name: "Product 3", price: 300 },
-        { name: "Product 4", price: 560 },
-        { name: "Product 5", price: 420 },
-        { name: "Product 6", price: 320 },
+        {
+          id: 1,
+          name: "Kurtha 1",
+          price: 100,
+          image: product.product1,
+        },
+        {
+          id: 2,
+          name: "Iphone 16",
+          price: 200,
+          image: product.product2,
+        },
+        {
+          id: 3,
+          name: "Charger",
+          price: 300,
+          image: product.product3,
+        },
+        {
+          id: 4,
+          name: "Kurtha 2",
+          price: 800,
+          image: product.product1,
+        },
       ]);
-      setIsLoading(false);
+      setLoading(false);
     }, 2000);
   }, []);
 
-  const renderSkeleton = () => (
-    <View style={styles.skeletonItem}>
-      <Text>Loading...</Text>
-    </View>
-  );
   return (
     <View style={styles.container}>
-      {isLoading ? (
+      <Text style={styles.header}>Products</Text>
+
+      {loading ? (
         <FlatList
-          data={Array(6).fill({})}
-          renderItem={renderSkeleton}
-          keyExtractor={(_, index) => `skeleton-${index}`}
+          data={Array(4).fill({})}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={() => (
+            <SkeletonLoader
+              width={150}
+              height={200}
+              borderRadius={10}
+              style={styles.skeleton}
+            />
+          )}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+          style={{ paddingBottom: 250 }}
         />
       ) : products.length > 0 ? (
-        <>
-          <FlatList
-            data={products}
-            style={{marginBottom:20}}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.product}>
-                <Text style={styles.text}>{item.name}</Text>
-                <Text style={styles.text}>${item.price}</Text>
-                <Button title="Add to Cart" onPress={() => addToCart(item)} />
-              </View>
-            )}
-          />
-          <Button
-            title="Go to Cart"
-            onPress={() => navigation.navigate("Cart")}
-          />
-        </>
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <ProductCard item={item} />}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+        />
       ) : (
-        <Text>No Products Available</Text>
+        <View style={styles.productContainer}>
+          <Image source={image.NoProducts} style={styles.noProducts} />
+          <Text style={styles.emptyText}>No Products Available</Text>
+        </View>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  product: {
-    padding: 10,
-    marginVertical: 10,
-    backgroundColor: "#f8f8f8",
-    borderRadius: 8,
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "white",
   },
-  text: { fontSize: 18 },
-  skeletonText: {
-    width: "80%",
-    height: 20,
-    borderRadius: 4,
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
     marginBottom: 10,
   },
-  skeletonButton: {
-    width: "50%",
-    height: 30,
-    borderRadius: 4,
+  emptyMessage: {
+    textAlign: "center",
+    fontSize: 16,
+    marginTop: 20,
+    color: "gray",
   },
-  skeletonItem: {
-    backgroundColor: "#ddd",
-    padding: 20,
-    margin: 5,
-    flex: 1,
+  skeleton: {
+    marginBottom: 10,
+  },
+  productContainer: {
+    flex: 0.8,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noProducts: {
+    height: 130,
+    width: 200,
+    objectFit: "contain",
+  },
+  emptyText: {
+    fontWeight: "400",
+    color: "#70727D",
+    marginTop: 10,
   },
 });
 
-export default Products;
+export default Product;
