@@ -17,7 +17,9 @@ const ProductCard = ({ item }) => {
     setLoading(true);
     setTimeout(() => {
       setCart((prevCart) => {
-        const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+        const existingItem = prevCart.find(
+          (cartItem) => cartItem.id === item.id
+        );
         if (existingItem) {
           return prevCart.map((cartItem) =>
             cartItem.id === item.id
