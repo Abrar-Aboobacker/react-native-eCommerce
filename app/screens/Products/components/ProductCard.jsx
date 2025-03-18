@@ -8,28 +8,28 @@ import {
 } from "react-native";
 import React, { useContext, useState } from "react";
 import CartContext from "../../../context/Cartcontext";
-import { useNavigation } from "@react-navigation/native";
 
 const ProductCard = ({ item }) => {
   const { cart, setCart } = useContext(CartContext);
-  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
-  const existingItem = cart.find((cartItem) => cartItem.id === item.id);
-
-  const handlePress = () => {
-    if (existingItem) {
-      navigation.navigate("cart");
-    } else {
-      setLoading(true);
-      setTimeout(() => {
-        setCart((prevCart) => [
-          ...prevCart,
-          { ...item, quantity: 1 },
-        ]);
-        setLoading(false);
-      }, 1000);
-    }
+  const handleAddToCart = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setCart((prevCart) => {
+        const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+        if (existingItem) {
+          return prevCart.map((cartItem) =>
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          );
+        } else {
+          return [...prevCart, { ...item, quantity: 1 }];
+        }
+      });
+      setLoading(false);
+    }, 1000);
   };
 
   return (
@@ -39,16 +39,14 @@ const ProductCard = ({ item }) => {
       <Text style={styles.text}>${item.price}</Text>
 
       <TouchableOpacity
-        onPress={handlePress}
+        onPress={handleAddToCart}
         style={styles.buttonContainer}
         disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="white" />
         ) : (
-          <Text style={styles.buttonTxt}>
-            {existingItem ? "Go to Cart" : "Add to Cart"}
-          </Text>
+          <Text style={styles.buttonTxt}>Add to Cart</Text>
         )}
       </TouchableOpacity>
     </View>
